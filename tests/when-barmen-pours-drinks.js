@@ -8,7 +8,8 @@ var SmsService = require('../src/sms-service');
 var Visitor = require('../src/visitor');
 var CupboardFake = require('../tests/fakes/cupboard-fake');
 var SmsServiceFake = require('../tests/fakes/sms-service-fake');
-
+var CashMachine = require('../src/cash-machine');
+var CashMachineFake = require('../tests/fakes/cash-machine-fake');
 suite('When barmen pours drinks', function () {
     suite('cupboard is empty', function () {
         let visitor = {};
@@ -31,7 +32,6 @@ suite('When barmen pours drinks', function () {
 
             assert.equal(smsService.lastSentSms, "Hello. We have run out of vodka. Please buy several bottles.");
         });
-
 
 
 
@@ -66,4 +66,12 @@ suite('When barmen pours drinks', function () {
 
     });
 
+    suite("", function() {
+        test("accounting tracker is called after purchase of drink", function() {
+            let smsService = new SmsServiceFake();
+
+            barmen = new Barmen(emptyCupboard, smsService);
+
+        });
+    });
 });

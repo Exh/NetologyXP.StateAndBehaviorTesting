@@ -1,7 +1,7 @@
 'use strict';
 
 class Barmen {
-    constructor(cupboard, smsService) {
+    constructor(cupboard, smsService, accounting) {
         this._cupboard = cupboard;
         this._smsService = smsService;
         this._wasSmsSent = false;
