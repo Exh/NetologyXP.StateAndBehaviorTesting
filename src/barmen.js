@@ -1,9 +1,10 @@
 'use strict';
 
 class Barmen {
-    constructor(cupboard, smsService, accounting) {
+    constructor(cupboard, smsService, cashMachine) {
         this._cupboard = cupboard;
         this._smsService = smsService;
+        this._cashMachine = cashMachine;
         this._wasSmsSent = false;
     }
 
@@ -16,7 +17,7 @@ class Barmen {
             this._smsService.send("Hello. We have run out of " + drinkName + ". Please buy several bottles.");
             this._wasSmsSent = this._smsService.wasCalled();
         }
-
+        this._cashMachine.add_item(drinkName + ": " + volume + " ml");
         return this._cupboard.getDrink(drinkName, volume);
     }
 }

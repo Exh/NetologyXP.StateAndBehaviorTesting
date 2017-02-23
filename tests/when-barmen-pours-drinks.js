@@ -10,11 +10,13 @@ var CupboardFake = require('../tests/fakes/cupboard-fake');
 var SmsServiceFake = require('../tests/fakes/sms-service-fake');
 var CashMachine = require('../src/cash-machine');
 var CashMachineFake = require('../tests/fakes/cash-machine-fake');
+
 suite('When barmen pours drinks', function () {
+    let visitor = {};
+    let barmen = {};
     suite('cupboard is empty', function () {
-        let visitor = {};
-        let barmen = {};
         let emptyCupboard = {};
+        let cashMachine = [];
 
         setup(function () {
             visitor = new Visitor();
@@ -22,11 +24,13 @@ suite('When barmen pours drinks', function () {
 
             emptyCupboard = new CupboardFake();
             emptyCupboard.empty = true;
+
+            cashMachine = new CashMachineFake();
         });
 
         test('sms to buy drink is sent to boss', function () {
             let smsService = new SmsServiceFake();
-            barmen = new Barmen(emptyCupboard, smsService);
+            barmen = new Barmen(emptyCupboard, smsService, cashMachine);
 
             barmen.pour("vodka", 100, visitor);
 
@@ -39,7 +43,7 @@ suite('When barmen pours drinks', function () {
         test('sms service is called if no drink is available', function () {
             let smsService = new SmsService();
             let smsServiceMock = sinon.mock(smsService);
-            barmen = new Barmen(emptyCupboard, smsService);
+            barmen = new Barmen(emptyCupboard, smsService, cashMachine);
             smsServiceMock.expects("send")
                 .once()
                 .withArgs("Hello. We have run out of vodka. Please buy several bottles.");
@@ -57,7 +61,7 @@ suite('When barmen pours drinks', function () {
 
         test('barmen sends sms to buy drink to boss', function () {
             let smsService = new SmsServiceFake();
-            barmen = new Barmen(emptyCupboard, smsService);
+            barmen = new Barmen(emptyCupboard, smsService, cashMachine);
 
             barmen.pour("vodka", 100, visitor);
 
@@ -66,12 +70,29 @@ suite('When barmen pours drinks', function () {
 
     });
 
-    suite("", function() {
+    suite("cupboard is full", function() {
+        let fullCupboard = {};
+        let cashMachine = [];
+
+        setup(function () {
+            visitor = new Visitor();
+            visitor.sober();
+
+            fullCupboard = new CupboardFake();
+            fullCupboard.empty = false;
+        });
+
         test("accounting tracker is called after purchase of drink", function() {
             let smsService = new SmsServiceFake();
+            cashMachine = new CashMachine();
+            let cashMachineMock = sinon.mock(cashMachine);
+            barmen = new Barmen(fullCupboard, smsService, cashMachine);
 
-            barmen = new Barmen(emptyCupboard, smsService);
+            cashMachineMock.expects("add_item").once().withArgs("vodka: 100 ml");
+            barmen.pour("vodka", 100, visitor);
 
+            cashMachineMock.verify();
+            cashMachineMock.restore();
         });
     });
 });
