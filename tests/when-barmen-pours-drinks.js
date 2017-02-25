@@ -65,8 +65,24 @@ suite('When barmen pours drinks', function () {
 
             barmen.pour("vodka", 100, visitor);
 
-            assert.equal(true, barmen.wasSmsSent);
+            assert.equal(true, barmen.wasSmsSent("vodka"));
         });
+
+        test('Barmen sends sms to buy drink to boss. Barman does it one time only for each drink', function () {
+            let smsService = new SmsService();
+            let smsServiceMock = sinon.mock(smsService);
+            barmen = new Barmen(emptyCupboard, smsService, cashMachine);
+            smsServiceMock.expects("send")
+                .once()
+                .withArgs("Hello. We have run out of vodka. Please buy several bottles.");
+
+            barmen.pour("vodka", 100, visitor);
+            barmen.pour("vodka", 100, visitor);
+
+            smsServiceMock.verify();
+            smsServiceMock.restore();
+        });
+
 
     });
 
