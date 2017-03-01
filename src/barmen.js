@@ -32,7 +32,7 @@ class Barmen {
             }
             return 0;
         }
-        this._cashMachine.add_item(drinkName + ": " + volume + " ml");
+        this._cashMachine.add_item(drinkName, volume);
         return this._cupboard.getDrink(drinkName, volume);
     }
 }

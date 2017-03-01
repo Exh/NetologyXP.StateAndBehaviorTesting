@@ -101,14 +101,27 @@ suite('When barmen pours drinks', function () {
         test("accounting tracker is called after purchase of drink", function() {
             let smsService = new SmsServiceFake();
             cashMachine = new CashMachine();
+
             let cashMachineMock = sinon.mock(cashMachine);
             barmen = new Barmen(fullCupboard, smsService, cashMachine);
 
-            cashMachineMock.expects("add_item").once().withArgs("vodka: 100 ml");
+            cashMachineMock.expects("add_item").once().withArgs("vodka", 100);
             barmen.pour("vodka", 100, visitor);
 
             cashMachineMock.verify();
             cashMachineMock.restore();
+        });
+
+
+        test("client buy 100 ml of vodka, total cash of cash machine is 85", function() {
+            let smsService = new SmsServiceFake();
+            cashMachine = new CashMachineFake();
+            barmen = new Barmen(fullCupboard, smsService, cashMachine);
+            cashMachine.set_price_for_item("vodka", 850);
+
+            barmen.pour("vodka", 100, visitor);
+
+            assert.equal(85, cashMachine.total);
         });
     });
 });

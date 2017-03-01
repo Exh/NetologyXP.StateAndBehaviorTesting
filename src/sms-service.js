@@ -1,7 +1,7 @@
 "use strict";
 
 class SmsService {
-    construct()
+    constructor()
     {
         this._was_called = false;
     }
